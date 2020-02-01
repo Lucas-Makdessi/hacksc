@@ -122,8 +122,23 @@ for entity in entity_list.entities:
                 query.append(format(entity.name))
 
 for token in syntax_list.tokens:
-    x = 1
+    text = token.text
 
+    if format(token.lemma).lower() == "be" or format(token.lemma).lower() == "do":
+        negative = ""
+
+        for other_token in syntax_list.tokens:
+            if format(enums.DependencyEdge.Label(other_token.dependency_edge.label).name).lower() == "neg":
+                negative = " " + format(other_token.text.content)
+
+        if negative == "":
+
+            query.append(format(text.content))
+        else:
+            query.append(format(text.content) + negative)
+
+    elif format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "adj" or format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "verb":
+        query.append(format(token.text.content))
 
 for item in query:
     print(item)
