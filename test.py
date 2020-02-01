@@ -2,144 +2,103 @@ from google.cloud import language_v1
 from google.cloud.language_v1 import enums
 
 
-def analyze_entities(text_content):
+def get_keywords(question):
     client = language_v1.LanguageServiceClient()
 
     type_ = enums.Document.Type.PLAIN_TEXT
 
     language = "en"
-    document = {"content": text_content, "type": type_, "language": language}
+
+    # question = input("What is your medical question? ")
+
+    document = {"content": question, "type": type_, "language": language}
 
     encoding_type = enums.EncodingType.UTF8
 
-    response = client.analyze_entities(document, encoding_type=encoding_type)
+    entity_list = client.analyze_entities(document, encoding_type=encoding_type)
+    syntax_list = client.analyze_syntax(document, encoding_type=encoding_type)
 
-    for entity in response.entities:
-        print(u"Representative name for the entity: {}".format(entity.name))
+    query = []
 
-        # Get entity type, e.g. PERSON, LOCATION, ADDRESS, NUMBER, et al
-        print(u"Entity type: {}".format(enums.Entity.Type(entity.type).name))
+    for entity in entity_list.entities:
+        if format(enums.Entity.Type(entity.type).name).lower() == "number":
+            query.append(format(entity.name))
+        elif format(enums.Entity.Type(entity.type).name).lower() == "other":
+            query.append(format(entity.name))
+        elif format(enums.Entity.Type(entity.type).name).lower() == "person":
+            for mention in entity.mentions:
+                if format(enums.EntityMention.Type(mention.type).name).lower != "proper":
+                    query.append(format(entity.name))
 
-        # Get the salience score associated with the entity in the [0, 1.0] range
-        # print(u"Salience score: {}".format(entity.salience))
-
-        # Loop over the metadata associated with entity. For many known entities,
-        # the metadata is a Wikipedia URL (wikipedia_url) and Knowledge Graph MID (mid).
-        # Some entity types may have additional metadata, e.g. ADDRESS entities
-        # may have metadata for the address street_name, postal_code, et al.
-        # """
-        for metadata_name, metadata_value in entity.metadata.items():
-            print(u"{}: {}".format(metadata_name, metadata_value))
-        # """
-
-        # Loop over the mentions of this entity in the input document.
-        # The API currently supports proper noun mentions.
-
-        # """
-        for mention in entity.mentions:
-            print(u"Mention text: {}".format(mention.text.content))
-            # Get the mention type, e.g. PROPER for proper noun
-            print(
-                u"Mention type: {}".format(enums.EntityMention.Type(mention.type).name)
-            )
-        # """
-
-    return response
-
-    # Get the language of the text, which will be the same as
-    # the language specified in the request or, if not specified,
-    # the automatically-detected language.
-    # print(u"Language of the text: {}".format(response.language))
-
-
-def analyze_syntax(text_content):
-
-    client = language_v1.LanguageServiceClient()
-    # Available types: PLAIN_TEXT, HTML
-    type_ = enums.Document.Type.PLAIN_TEXT
-
-    language = "en"
-    document = {"content": text_content, "type": type_, "language": language}
-
-    encoding_type = enums.EncodingType.UTF8
-
-    response = client.analyze_syntax(document, encoding_type=encoding_type)
-
-    # return response
-
-    # Loop through tokens returned from the API
-    for token in response.tokens:
-        # Get the text content of this token. Usually a word or punctuation.
+    for token in syntax_list.tokens:
         text = token.text
-        print(u"Token text: {}".format(text.content))
-        # print(u"Location of this token in overall document: {}".format(text.begin_offset))
-        part_of_speech = token.part_of_speech
-        print(u"Lemma: {}".format(token.lemma))
 
-        print(
-            u"Part of Speech tag: {}".format(
-                enums.PartOfSpeech.Tag(part_of_speech.tag).name
-            )
-        )
+        if format(token.lemma).lower() == "be" or format(token.lemma).lower() == "do" or format(token.lemma).lower() == "have":
+            negative = ""
 
-        # Get the dependency tree parse information for this token.
-        # For more information on dependency labels:
-        # http://www.aclweb.org/anthology/P13-2017
+            for other_token in syntax_list.tokens:
+                if format(enums.DependencyEdge.Label(other_token.dependency_edge.label).name).lower() == "neg":
+                    negative = " " + format(other_token.text.content)
 
-        # """
-        dependency_edge = token.dependency_edge
-        print(u"Head token index: {}".format(dependency_edge.head_token_index))
-        print(
-            u"Label: {}".format(enums.DependencyEdge.Label(dependency_edge.label).name)
-        )
-        # """
-    return response
+            if negative == "":
+                query.append(format(text.content))
+            else:
+                query.append(format(text.content) + negative)
 
-    # Get the language of the text, which will be the same as
-    # the language specified in the request or, if not specified,
-    # the automatically-detected language.
+        elif format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "adj" or format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "verb":
+            query.append(format(token.text.content))
 
-    # print(u"Language of the text: {}".format(response.language))
+    return query
 
 
+def answer_question():
+    question = input("What is your medical question? ")
 
-question = input("What is your medical question? ")
+    query = get_keywords(question)
 
-syntax_list = analyze_syntax(question)
-entity_list = analyze_entities(question)
+    answer_sets = []
 
-query = []
+    dic = {"toe": [("my toe is bent", "it is probably broken"), ("my toe is purple", "put some ice on it")],
+           "bent": [("my toe is bent", "it is probably broken")],
+           "my": [("my toe is bent", "it is probably broken"), ("my toe is purple", "put some ice on it")],
+           "is": [("my toe is bent", "it is probably broken"), ("my toe is purple", "put some ice on it")],
+           "purple": [("my toe is purple", "put some ice on it")],
+           }
 
-for entity in entity_list.entities:
+    final_answer = set()
+    index = 0
 
-    if format(enums.Entity.Type(entity.type).name).lower() == "number":
-        query.append(format(entity.name))
-    elif format(enums.Entity.Type(entity.type).name).lower() == "other":
-        query.append(format(entity.name))
-    elif format(enums.Entity.Type(entity.type).name).lower() == "person":
-        for mention in entity.mentions:
-            if format(enums.EntityMention.Type(mention.type).name).lower != "proper":
-                query.append(format(entity.name))
+    for i in range(len(query)):
+        answer_sets.append({""})
 
-for token in syntax_list.tokens:
-    text = token.text
+    for keyword in query:
+        answer_sets[index].clear()
+        if keyword in dic:
+            for answer in dic[keyword]:
+                (answer_sets[index]).add(answer[1])
+                final_answer.add(answer[1])
 
-    if format(token.lemma).lower() == "be" or format(token.lemma).lower() == "do":
-        negative = ""
+        index += 1
 
-        for other_token in syntax_list.tokens:
-            if format(enums.DependencyEdge.Label(other_token.dependency_edge.label).name).lower() == "neg":
-                negative = " " + format(other_token.text.content)
+    bad_keys = []
 
-        if negative == "":
+    for index in range(len(answer_sets)):
 
-            query.append(format(text.content))
+        if len(final_answer & answer_sets[index]) == 0:
+                bad_keys.append(query[index])
         else:
-            query.append(format(text.content) + negative)
+            final_answer = final_answer & answer_sets[index]
 
-    elif format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "adj" or format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "verb":
-        query.append(format(token.text.content))
+    print("These keywords were unhelpful: ", end="")
+    for bad in bad_keys:
+        print(bad, end=" ")
+    print()
 
-for item in query:
-    print(item)
+    if len(final_answer) == 0:
+        print("I could not find any information on this")
+    else:
+        for item in final_answer:
+            print("The doctor says: ", item)
 
+
+answer_question()
