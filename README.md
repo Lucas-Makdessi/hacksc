@@ -1,5 +1,10 @@
 # hackSC 2020
 
+## How to run
+
+UI: open run Chat/Chat.xcworkspace
+Backend: run fireBaseTest2.py
+
 ## Inspiration
 
 We chose to tackle the equity vertical and found that there are many inequalities in the healthcare industry. Specifically, with the emergence of "e-health" as a result of "advances in communication and computer technologies have revolutionized the way health information is gathered, disseminated, and used by healthcare providers, patients, citizens, and mass media."
