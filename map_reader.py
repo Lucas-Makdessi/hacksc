@@ -1,50 +1,63 @@
-import csv
+import marshal
 from test import get_keywords
-from test import answer_question
-import ast
-import pickle
-import time
+import functools
 
+file = open("data_set10.json", 'rb')
+dic = marshal.load(file)
 
-medical_map = {"": [""]}
-medical_map.clear()
+def rankQuestions(set, query):
+    return set
 
-file = open("questions2.txt", "w")
-
-answer_dict = dict()
-
-with open("data.csv") as csvDataFile:
-    csvReader = csv.reader(csvDataFile)
-
-    count = 0
-
-    for row in csvReader:
-        if count > 800000:
-            file.write("{} ".format(row[3]))
-
-            # keywords = get_keywords(row[3])
-
-            #answer_list = ast.literal_eval(row[1])
-
-            # for dic in answer_list:
-            #
-            #     answer = "{} says {}".format(dic["doctor_name"], dic["answer"])
-            #
-            #     for keyword in keywords:
-            #         if keyword in medical_map:
-            #             medical_map[keyword].append(answer)
-            #         else:
-            #             answers = [answer]
-            #             medical_map.update({keyword: answers})
-
-        count += 1
-
+for i in range(0,200):
+    dic2 = marshal.load(file)
+    dic.update(marshal.load(file))
 
 file.close()
 
-# f = open("data_set.pkl", "wb")
-# pickle.dump(medical_map, f)
-# f.close()
+file=open("data_set.json", 'rb')
 
-# answer_question(medical_map)
+for i in range(2030):
+    print(i)
+    dic.update(marshal.load(file))
+
+file.close()
+
+print(len(dic))
+
+def getSetIntsersection(question):
+    # for key, value in dic.items() :
+    #     print (key)
+    query = get_keywords(question)
+    print(query)
+    if len(query) == 1:
+        if query[0] in dic:
+            return rankQuestions(dic[query[0]], query)
+        else:
+            return("no useful queries were found")
+    elif len(query) == 0:
+        return("no queries were found")
+    else:
+        finalSet = {}
+        prevSet = {}
+        setList = []
+        for val in query:
+            if val in dic:
+                setList.append(set(dic[val]))
+        if len(setList) == 0:
+            return("no matching records were found")
+        elif len(setList) == 1:
+            return rankQuestions(setList[0], query)
+        else:
+            prevSet = setList[0]
+            for i in range(1,len(setList)):
+                finalSet = set.intersection(prevSet, setList[i])
+                if (len(finalSet)) == 0:
+                    return rankQuestions(prevSet, query)
+                prevSet = finalSet
+            return rankQuestions(finalSet, query)
+
+
+if __name__ == "__main__":
+    print(getSetIntsersection(input("q: ")))
+
 
