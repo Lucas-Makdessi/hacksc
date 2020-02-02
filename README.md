@@ -1,4 +1,4 @@
-# hackSC 2020
+# hackSC 2020: MedChat
 
 ## How to run
 
@@ -17,7 +17,7 @@ quotes from: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2043145/
 
 ## What it does
 
-WebChat is a simple mobile interface for everyone to easily access and understand medical information. The user asks medical questions through an imessage-like interface and is given answers through an NLP AI trained chatbot with access to a dataset of 1+ million Q&A answers from doctors.
+MedChat is a simple mobile interface for everyone to easily access and understand medical information. The user asks medical questions through an imessage-like interface and is given answers through an NLP AI trained chatbot with access to a dataset of 1+ million Q&A answers from doctors.
 
 ## How we built it
 
