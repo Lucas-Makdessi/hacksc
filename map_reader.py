@@ -9,7 +9,7 @@ import functools
 dic = {}
 
 
-def rankQuestions(set, question):
+def rankQuestions(set, question, query):
     # set is a set of tuples from the final intersection
 
     tuples = list(set)
@@ -21,7 +21,10 @@ def rankQuestions(set, question):
         cur_max = 0
         for word in tuples[i]:
             if word in question:
-                cur_max += 1
+                if word in query:
+                    cur_max += 3
+                else:
+                    cur_max += 1
 
         if cur_max > max_words_in_common:
             max_words_in_common = cur_max
@@ -63,7 +66,7 @@ def getSetIntsersection(question):
     print(query)
     if len(query) == 1:
         if query[0] in dic:
-            return rankQuestions(dic[query[0]], question)
+            return rankQuestions(dic[query[0]], question, query)
         else:
             return("no useful queries were found")
     elif len(query) == 0:
@@ -78,15 +81,15 @@ def getSetIntsersection(question):
         if len(setList) == 0:
             return("no matching records were found")
         elif len(setList) == 1:
-            return rankQuestions(setList[0], query)
+            return rankQuestions(setList[0], question, query)
         else:
             prevSet = setList[0]
             for i in range(1,len(setList)):
                 finalSet = set.intersection(prevSet, setList[i])
                 if (len(finalSet)) == 0:
-                    return rankQuestions(prevSet, question)
+                    return rankQuestions(prevSet, question, query)
                 prevSet = finalSet
-            return rankQuestions(finalSet, question)
+            return rankQuestions(finalSet, question, query)
 
 
 if __name__ == "__main__":
