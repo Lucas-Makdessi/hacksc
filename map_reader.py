@@ -63,19 +63,20 @@ def getSetIntsersection(question):
     # for key, value in dic.items() :
     #     print (key)
     query = get_keywords(question)
-    print(query)
-    if len(query) == 1:
-        if query[0] in dic:
-            return rankQuestions(dic[query[0]], question, query)
+    query1 = query[0]
+    print(query1)
+    if len(query1) == 1:
+        if query1 in dic:
+            return rankQuestions(dic[query1[0]], question, query)
         else:
             return("no useful queries were found")
-    elif len(query) == 0:
+    elif len(query1) == 0:
         return("no queries were found")
     else:
         finalSet = {}
         prevSet = {}
         setList = []
-        for val in query:
+        for val in query1:
             if val in dic:
                 setList.append(set(dic[val]))
         if len(setList) == 0:

@@ -64,7 +64,7 @@ def get_keywords(question):
             query.append(format(token.text.content))
             query_values.append(1.5)
         elif format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "noun":
-            query.append(format(token.txt.content))
+            query.append(format(token.text.content))
             query_values.append(3)
 
     return (list(set(query)), query_values)
