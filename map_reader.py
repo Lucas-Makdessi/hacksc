@@ -1,4 +1,5 @@
 import marshal
+
 from test import get_keywords
 import functools
 
@@ -10,7 +11,12 @@ def rankQuestions(set, query):
 
 for i in range(0,200):
     dic2 = marshal.load(file)
-    dic.update(marshal.load(file))
+    for key in dic2:
+        if key in dic:
+            dic[key] += dic2[key]
+        else:
+            dic[key] = dic2[key]
+
 
 file.close()
 
@@ -18,7 +24,12 @@ file=open("data_set.json", 'rb')
 
 for i in range(2030):
     print(i)
-    dic.update(marshal.load(file))
+    dic2 = marshal.load(file)
+    for key in dic2:
+        if key in dic:
+            dic[key] += dic2[key]
+        else:
+            dic[key] = dic2[key]
 
 file.close()
 
@@ -59,5 +70,22 @@ def getSetIntsersection(question):
 
 if __name__ == "__main__":
     print(getSetIntsersection(input("q: ")))
+=======
+
+dic = dict()
+
+for i in range(2030):
+    dic.update(marshal.load(open("data_set.json", 'rb')))
+    print(i)
+
+print(len(dic))
+
+if "penis" in dic:
+    print(dic["penis"])
+
+
+
+
+
 
 
