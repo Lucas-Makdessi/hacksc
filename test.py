@@ -3,6 +3,8 @@ from google.cloud.language_v1 import enums
 
 
 def get_keywords(question):
+    len(question)
+
     client = language_v1.LanguageServiceClient()
 
     type_ = enums.Document.Type.PLAIN_TEXT
@@ -10,12 +12,15 @@ def get_keywords(question):
     language = "en"
 
 
-    document = {"gcs_content_uri": "gs://medicalnlp-1580537107836.appspot.com/questions.txt", "type": type_, "language": language}
+    document = {"gcs_content_uri": "gs://medicalnlp-1580537107836.appspot.com/questions/questions.txt.aa", "type": type_, "language": language}
 
+    print("made it past document loading")
     encoding_type = enums.EncodingType.UTF8
 
     entity_list = client.analyze_entities(document, encoding_type=encoding_type)
     syntax_list = client.analyze_syntax(document, encoding_type=encoding_type)
+
+    print("made it past nlp")
 
     query = []
 
@@ -57,6 +62,8 @@ def get_keywords(question):
 
         elif format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "adj" or format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "verb":
             query.append(format(token.text.content))
+
+    print("made it past parsing")
 
     return query
 
