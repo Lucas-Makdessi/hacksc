@@ -1,14 +1,13 @@
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
-from random import random
 from map_reader import getSetIntsersection
 import config
 
 # Fetch the service account key JSON file contents
-# cred = credentials.Certificate('C:\\Users\\Greenish\\Downloads\\chat-6fdfa-54c7ebf2b0b9.json')
+cred = credentials.Certificate('C:\\Users\\Greenish\\Downloads\\chat-6fdfa-54c7ebf2b0b9.json')
 
-cred = credentials.Certificate("/Users/lucasmakdessi/Downloads/chat-6fdfa-54c7ebf2b0b9.json")
+#cred = credentials.Certificate("/Users/lucasmakdessi/Downloads/chat-6fdfa-54c7ebf2b0b9.json")
 
 # Initialize the app with a service account, granting admin privileges
 firebase_admin.initialize_app(cred, {
@@ -19,6 +18,8 @@ ref = db.reference('/')
 ref.set('chats')
 chats_ref = ref.child('chats')
 
+# a method to ignore the first query pulled by the listener because this represents
+# the own program's first udpate
 def ignore_first_call(fn):
     called = False
 
@@ -38,10 +39,12 @@ def ignore_first_call(fn):
     }})
     return wrapper
 
+# a method called by the python listener to respond with a text output given a question
 def sendResponse(question):
     text = ""
     if question.lower() == "thanks" or question.lower() == "thank you":
         text = "Anything else I can help you with?"
+    # assuming that user correctly enters 1 or 2 to select the option and not some junk
     elif question == "1" or question == "2":
         text = config.setthing[int(question)-1][1]
     else:
@@ -62,8 +65,11 @@ def sendResponse(question):
 
     }})
 
+# a listener to listen for updates to the database
 @ignore_first_call
 def listener(event):
+    #only want put events because the user does put events and the program does patch events
+    #and we only want to respond to user input
     if (event.event_type == 'put'):
 
         print(event.event_type)  # can be 'put' or 'patch'
