@@ -31,7 +31,7 @@ def ignore_first_call(fn):
     db.reference('chats').update({"0": {
         'name': 'MedChat',
         'sender_id': '00000',
-        'text': 'Hi this is Dr MedBot, how may I help you?'
+        'text': 'Hi this is Dr. MedBot, how may I help you?'
 
     }})
     return wrapper
@@ -49,7 +49,7 @@ def sendResponse(question):
             text = set1
         else:
             config.setthing = set1
-            text = "I found two similiar questions, which would best fits your question?\n1) {}\n2) {}".format(set1[0][0],set1[1][0])
+            text = "I found two similiar questions, which would best fit your question?\n1) {}\n2) {}".format(set1[0][0],set1[1][0])
             #text = ', '.join(str(e[1]) for e in set1)
 
     config.x+= 1

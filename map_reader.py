@@ -24,8 +24,8 @@ def rankQuestions(set, question, query):
         for word in tuples[i]:
             if word in question:
                 if word in query[0]:
-                    #cur_max += query[1][query[0].index(word)]
-                    cur_max += 3
+                    cur_max += query[1][query[0].index(word)]
+                    #cur_max += 3
                 else:
                     cur_max += 1
         if cur_max == max_words_in_common:
