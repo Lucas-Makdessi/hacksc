@@ -11,7 +11,7 @@ def get_keywords(question):
 
     # question = input("What is your medical question? ")
 
-    document = {"content": question, "type": type_, "language": language}
+    document = {"gcs_content_uri": "gs://staging.medicalnlp-1580537107836.appspot.com/questions/questions.txt.{}".format(question), "type": type_, "language": language}
 
     encoding_type = enums.EncodingType.UTF8
 
@@ -100,5 +100,8 @@ def answer_question():
         for item in final_answer:
             print("The doctor says: ", item)
 
+textthing = "bb"
+result = get_keywords(textthing)
+with open("question{}Key.txt".format(textthing), 'w') as f:
+    f.write(result)
 
-answer_question()
