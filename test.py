@@ -102,6 +102,7 @@ def answer_question():
 
 textthing = "bb"
 result = get_keywords(textthing)
-with open("question{}Key.txt".format(textthing), 'w') as f:
-    f.write(result)
-
+print(result[0])
+f = open("question{}Key.txt".format(textthing), 'w')
+f.write(result)
+f.close()
