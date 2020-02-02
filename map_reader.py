@@ -12,34 +12,23 @@ dic = {}
 def rankQuestions(set, question, query):
     # set is a set of tuples from the final intersection
 
-    tuples = list(set)
-
-    max_words_in_common = 0
+    min_extra_words = 1000000
     best_question_index = 0
-    secondbest = 0
-    secondbest_index = 0
 
-    for i in range(len(tuples)):
-        cur_max = 0
-        for word in tuples[i]:
-            if word in question:
-                if word in query[0]:
-                    #cur_max += query[1][query[0].index(word)]
-                    cur_max += 3
-                else:
-                    cur_max += 1
-        if cur_max == max_words_in_common:
-            secondbest = cur_max
-            secondbest_index = i
-        elif cur_max > max_words_in_common:
-            max_words_in_common = cur_max
-            best_question_index = i
+    questions = list(set)
 
-    if tuples[best_question_index] != tuples[secondbest_index]:
-        return (tuples[best_question_index],tuples[secondbest_index])
-    else:
-        return tuples[best_question_index][1]
+    for tup in questions:
+        cur_extra_words = 0
+        for strn in tup[0]:
+            if strn not in query[0]:
+                cur_extra_words += 1
 
+        if cur_extra_words < min_extra_words:
+            min_extra_words = cur_extra_words
+            best_question_index = questions.index(tup)
+
+    return questions[best_question_index][0]
+                
 
 # for i in range(0,200):
 #     dic2 = marshal.load(file)
