@@ -16,21 +16,29 @@ def rankQuestions(set, question, query):
 
     max_words_in_common = 0
     best_question_index = 0
+    secondbest = 0
+    secondbest_index = 0
 
     for i in range(len(tuples)):
         cur_max = 0
         for word in tuples[i]:
             if word in question:
                 if word in query[0]:
-                    cur_max += query[1][query[0].index(word)]
+                    #cur_max += query[1][query[0].index(word)]
+                    cur_max += 3
                 else:
                     cur_max += 1
-
-        if cur_max > max_words_in_common:
+        if cur_max == max_words_in_common:
+            secondbest = cur_max
+            secondbest_index = i
+        elif cur_max > max_words_in_common:
             max_words_in_common = cur_max
             best_question_index = i
 
-    return tuples[best_question_index][1]
+    if tuples[best_question_index] != tuples[secondbest_index]:
+        return (tuples[best_question_index],tuples[secondbest_index])
+    else:
+        return tuples[best_question_index][1]
 
 
 # for i in range(0,200):
@@ -63,19 +71,20 @@ def getSetIntsersection(question):
     # for key, value in dic.items() :
     #     print (key)
     query = get_keywords(question)
-    print(query)
-    if len(query) == 1:
-        if query[0] in dic:
-            return rankQuestions(dic[query[0]], question, query)
+    query1 = query[0]
+    print(query1)
+    if len(query1) == 1:
+        if query1 in dic:
+            return rankQuestions(dic[query1[0]], question, query)
         else:
             return("no useful queries were found")
-    elif len(query) == 0:
+    elif len(query1) == 0:
         return("no queries were found")
     else:
         finalSet = {}
         prevSet = {}
         setList = []
-        for val in query:
+        for val in query1:
             if val in dic:
                 setList.append(set(dic[val]))
         if len(setList) == 0:

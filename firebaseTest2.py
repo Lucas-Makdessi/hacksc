@@ -42,13 +42,16 @@ def sendResponse(question):
     text = ""
     if question.lower() == "thanks" or question.lower() == "thank you":
         text = "Anything else I can help you with?"
+    elif question == "1" or question == "2":
+        text = config.setthing[int(question)-1][1]
     else:
         set1 = getSetIntsersection(question)
 
         if type(set1) is str:
             text = set1
         else:
-            text = set1.pop()[1]
+            config.setthing = set1
+            text = "I found two similiar questions, which would best fits your question?\n1) {}\n2) {}".format(set1[0][0],set1[1][0])
             #text = ', '.join(str(e[1]) for e in set1)
 
     config.x+= 1
