@@ -6,7 +6,9 @@ from map_reader import getSetIntsersection
 import config
 
 # Fetch the service account key JSON file contents
-cred = credentials.Certificate('C:\\Users\\Greenish\\Downloads\\chat-6fdfa-54c7ebf2b0b9.json')
+# cred = credentials.Certificate('C:\\Users\\Greenish\\Downloads\\chat-6fdfa-54c7ebf2b0b9.json')
+
+cred = credentials.Certificate("/Users/lucasmakdessi/Downloads/chat-6fdfa-54c7ebf2b0b9.json")
 
 # Initialize the app with a service account, granting admin privileges
 firebase_admin.initialize_app(cred, {
