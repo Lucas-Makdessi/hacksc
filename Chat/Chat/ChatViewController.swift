@@ -70,7 +70,7 @@ class ChatViewController: JSQMessagesViewController {
                 let text        = data["text"],
                 !text.isEmpty
             {
-                if let message = JSQMessage(senderId: id, displayName: name, text: text)
+                if let message = JSQMessage(senderId: id, displayName: name, text: text.replacingOccurrences(of: "\\n", with: "\n"))
                 {
                     self?.messages.append(message)
 

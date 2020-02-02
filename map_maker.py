@@ -1,6 +1,6 @@
 import csv
 import ast
-import pickle
+import marshal
 import spacy
 
 medical_map = {"": [("", ""), ("", "")]}
@@ -8,6 +8,8 @@ medical_map.clear()
 
 spacy.prefer_gpu()
 nlp = spacy.load("en_core_web_sm")
+
+f = open("data_set.json", "wb")
 
 answer_dict = dict()
 
@@ -17,9 +19,10 @@ with open("data.csv") as csvDataFile:
     count = 0
 
     for row in csvReader:
-        if count % 1000 == 0 and count != 0:
+        if count % 500 == 0 and count != 0:
+            marshal.dump(medical_map, f)
+            medical_map.clear()
             print(count)
-            break
 
         if count != 0:
 
@@ -46,9 +49,5 @@ with open("data.csv") as csvDataFile:
                         medical_map.update({keyword: qa})
         count += 1
 
-
-f = open("data_set.txt", "wb")
-
-pickle.dump(medical_map, f)
-
+f.close()
 

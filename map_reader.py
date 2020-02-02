@@ -1,10 +1,19 @@
-import pickle
+import marshal
+
+dic = dict()
+
+for i in range(2030):
+    dic.update(marshal.load(open("data_set.json", 'rb')))
+    print(i)
+
+print(len(dic))
+
+if "penis" in dic:
+    print(dic["penis"])
 
 
-dic = pickle.load(open("data_set.txt", 'rb'))
 
-for key, value in dic.items():
-    print("Entry: ", end="")
-    print(key, value)
+
+
 
 
