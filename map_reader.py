@@ -21,8 +21,8 @@ def rankQuestions(set, question, query):
         cur_max = 0
         for word in tuples[i]:
             if word in question:
-                if word in query:
-                    cur_max += 3
+                if word in query[0]:
+                    cur_max += query[1][query[0].index(word)]
                 else:
                     cur_max += 1
 

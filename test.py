@@ -15,16 +15,20 @@ def get_keywords(question):
     entity_list = client.analyze_entities(document, encoding_type=encoding_type)
     syntax_list = client.analyze_syntax(document, encoding_type=encoding_type)
     query = []
+    query_values = []
 
     for entity in entity_list.entities:
         if format(enums.Entity.Type(entity.type).name).lower() == "number":
             query.append(format(entity.name))
+            query_values.append(2)
         elif format(enums.Entity.Type(entity.type).name).lower() == "other":
             query.append(format(entity.name))
+            query_values.append(3)
         elif format(enums.Entity.Type(entity.type).name).lower() == "person":
             for mention in entity.mentions:
                 if format(enums.EntityMention.Type(mention.type).name).lower != "proper":
                     query.append(format(entity.name))
+                    query_values.append(3)
 
     for token in syntax_list.tokens:
         text = token.text
@@ -44,18 +48,26 @@ def get_keywords(question):
             if negative == "":
                 if '\'' not in format(text.content):
                     query.append(format(text.content))
+                    query_values.append(0)
                 else:
                     query.append(format(token.lemma))
+                    query_values.append(0)
             else:
                 if '\'' not in format(text.content):
                     query.append(format(text.content) + negative)
+                    query_values.append(0)
                 else:
                     query.append(format(token.lemma))
+                    query_values.append(0)
 
         elif format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "adj" or format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "verb":
             query.append(format(token.text.content))
-    print("returned")
-    return query
+            query_values.append(1.5)
+        elif format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "noun":
+            query.append(format(token.txt.content))
+            query_values.append(3)
+
+    return (list(set(query)), query_values)
 
 
 def answer_question(dic):
