@@ -9,9 +9,8 @@ def get_keywords(question):
 
     language = "en"
 
-    # question = input("What is your medical question? ")
 
-    document = {"content": question, "type": type_, "language": language}
+    document = {"gcs_content_uri": "gs://medicalnlp-1580537107836.appspot.com/questions.txt", "type": type_, "language": language}
 
     encoding_type = enums.EncodingType.UTF8
 
@@ -38,12 +37,23 @@ def get_keywords(question):
 
             for other_token in syntax_list.tokens:
                 if format(enums.DependencyEdge.Label(other_token.dependency_edge.label).name).lower() == "neg":
-                    negative = " " + format(other_token.text.content)
+                    t1 = int(format(token.dependency_edge.head_token_index)) # should be smaller
+                    t2 = int(format(other_token.dependency_edge.head_token_index))
+                    if t2 - t1 - len(format(token.dependency_edge.head_token_index)) == 0:
+                        negative = " " + format(other_token.text.content)
+                    elif t2 - t1 - len(format(token.dependency_edge.head_token_index)) - 1 == 0:
+                        negative = " " + format(other_token.text.content)
 
             if negative == "":
-                query.append(format(text.content))
+                if '\'' not in format(text.content):
+                    query.append(format(text.content))
+                else:
+                    query.append(format(token.lemma))
             else:
-                query.append(format(text.content) + negative)
+                if '\'' not in format(text.content):
+                    query.append(format(text.content) + negative)
+                else:
+                    query.append(format(token.lemma))
 
         elif format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "adj" or format(enums.PartOfSpeech.Tag(token.part_of_speech.tag).name).lower() == "verb":
             query.append(format(token.text.content))
@@ -51,19 +61,15 @@ def get_keywords(question):
     return query
 
 
-def answer_question():
+def answer_question(dic):
+
+    # dic = { "string": ["answer1", "answer2", ... ], ... }
+
     question = input("What is your medical question? ")
 
     query = get_keywords(question)
 
     answer_sets = []
-
-    dic = {"toe": [("my toe is bent", "it is probably broken"), ("my toe is purple", "put some ice on it")],
-           "bent": [("my toe is bent", "it is probably broken")],
-           "my": [("my toe is bent", "it is probably broken"), ("my toe is purple", "put some ice on it")],
-           "is": [("my toe is bent", "it is probably broken"), ("my toe is purple", "put some ice on it")],
-           "purple": [("my toe is purple", "put some ice on it")],
-           }
 
     final_answer = set()
     index = 0
@@ -75,8 +81,8 @@ def answer_question():
         answer_sets[index].clear()
         if keyword in dic:
             for answer in dic[keyword]:
-                (answer_sets[index]).add(answer[1])
-                final_answer.add(answer[1])
+                (answer_sets[index]).add(answer)
+                final_answer.add(answer)
 
         index += 1
 
@@ -89,16 +95,23 @@ def answer_question():
         else:
             final_answer = final_answer & answer_sets[index]
 
-    print("These keywords were unhelpful: ", end="")
-    for bad in bad_keys:
-        print(bad, end=" ")
-    print()
+    # print("These keywords were unhelpful: ", end="")
+    # for bad in bad_keys:
+    #     print(bad, end=" ")
+    # print()
 
     if len(final_answer) == 0:
         print("I could not find any information on this")
     else:
         for item in final_answer:
-            print("The doctor says: ", item)
+            print(item)
 
 
-answer_question()
+file = open("key_words.txt", "w")
+result = get_keywords("hi")
+
+for string in result:
+    file.write(string + " ")
+
+file.close()
+
